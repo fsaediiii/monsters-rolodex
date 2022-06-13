@@ -1,10 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,ChangeEvent } from "react";
 import CardList from "./components/CardList/CardList.component";
 import SearchBox from "./components/SearchBox/SearchBox.component";
+import { getData } from "./utils/data.utils";
 import "./App.css";
 
+type Monster = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type typeState = {
+  monsters: Monster[];
+  searchField: string;
+};
+
 function App() {
-  const [state, setState] = useState({
+  const [state, setState] = useState<typeState>({
     monsters: [],
     searchField: "",
   });
@@ -12,17 +24,18 @@ function App() {
   const { monsters, searchField } = state;
 
   const fetchMonsters = async () => {
-    await fetch("https://jsonplaceholder.typicode.com/users")
-      .then((response) => response.json())
-      .then((monsters) =>
-        setState((prevState) => ({
-          ...prevState,
-          monsters: monsters,
-        }))
-      );
+    const monsters = await getData<Monster[]>(
+      "https://jsonplaceholder.typicode.com/users"
+    );
+    if (monsters) {
+      setState((prevState) => ({
+              ...prevState,
+              monsters: monsters,
+            }))
+    }
   };
 
-  const onChangeFilter = (event) => {
+  const onChangeFilter = (event:ChangeEvent<HTMLInputElement>):void => {
     let value = event.target.value.toLowerCase();
     setState((prevState) => ({
       ...prevState,
